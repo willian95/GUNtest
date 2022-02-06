@@ -1,0 +1,105 @@
+<html>
+  <head>
+    <link rel="manifest" href="./manifest.json">
+    <script>
+      if("serviceWorker" in navigator){
+        navigator.serviceWorker.register("sw.js")
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Todos</h1>
+    <p class="status"></p>
+    <ul></ul>
+
+    <form><input><button>Add</button></form>
+
+    <script src="gun.js"></script>
+    <script src="jquery.min.js"></script>
+    <script>
+      var todos = Gun().get('todos')
+
+      $('form').on('submit', function (event) {
+
+        var input = $('form').find('input')
+        todos.set({title: input.val()})
+        input.val('')
+        event.preventDefault()
+      })
+
+      todos.map().on(function (todo, id) {
+        var li = $('#' + id)
+        if (!li.get(0)) {
+          li = $('<li>').attr('id', id).appendTo('ul')
+        }
+        if (todo) {
+          var html = '<span onclick="clickTitle(this)">' + todo.title + '</span>'
+          html = '<input type="checkbox" onclick="clickCheck(this)" ' + (todo.done ? 'checked' : '') + '>' + html
+          html += '<button onclick="clickDelete(this)">X</button>'
+          li.html(html)
+        } else {
+          li.remove()
+        }
+      })
+      function clickTitle (element) {
+        element = $(element)
+        if (!element.find('input').get(0)) {
+          element.html('<input value="' + element.html() + '" onkeyup="keypressTitle(this)">')
+        }
+      }
+
+      function keypressTitle (element) {
+        if (event.keyCode === 13) {
+          todos.get($(element).parent().parent().attr('id')).put({title: $(element).val()})
+        }
+      }
+      
+      function clickCheck (element) {
+        todos.get($(element).parent().attr('id')).put({done: $(element).prop('checked')})
+      }
+
+      function clickDelete (element) {
+        todos.get($(element).parent().attr('id')).put(null)
+      }
+
+      function hasNetwork(online) {
+        const element = document.querySelector(".status");
+        // Update the DOM to reflect the current status
+        if (online) {
+          element.classList.remove("offline");
+          element.classList.add("online");
+          element.innerText = "Online";
+        } else {
+          element.classList.remove("online");
+          element.classList.add("offline");
+          element.innerText = "Offline";
+        }
+      }
+
+      window.addEventListener("load", () => {
+        hasNetwork(navigator.onLine);
+
+        window.addEventListener("online", () => {
+          // Set hasNetwork to online when they change to online.
+          hasNetwork(true);
+        });
+
+        window.addEventListener("offline", () => {
+          // Set hasNetwork to offline when they change to offline.
+          hasNetwork(false);
+        });
+
+      });
+      
+    </script>
+    
+    <style>
+      ul { padding: 0; }
+      li { display: flex; }
+      li span { width: 150px; word-break: break-all; }
+      img { height: 20px; margin-left: 8px; cursor: pointer; }
+      input { width: 150px; margin-right: 8px; }
+      input[type='checkbox'] { width: auto; }
+    </style>
+  </body>
+</html>

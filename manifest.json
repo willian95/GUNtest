@@ -1,0 +1,17 @@
+{
+    "name": "Prueba GUN",
+    "short_name": "GUN",
+    "theme_color": "#000000",
+    "background_color": "#FFFFFF",
+    "display":"standalone",
+    "orientation":"portrait",
+    "scope":"./",
+    "start_url":"./",
+    "icons":[
+        {
+            "src":"./images/icono.png",
+            "type":"image",
+            "sizes":"512x512"
+        }
+    ]
+}
